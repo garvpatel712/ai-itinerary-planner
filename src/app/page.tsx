@@ -1,94 +1,129 @@
-import Image from "next/image";
 import Link from "next/link";
+import TripForm from "@/components/TripForm";
 
 export default function Home() {
   return (
     <div className="min-h-[calc(100vh-200px)]">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary to-primary/80 text-white py-24">
-        <div className="max-w-7xl mx-auto px-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-24 items-center">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-8">
-                Plan Your Next Adventure
+      <section className="bg-gradient-to-br from-primary via-primary to-accent py-20 lg:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            {/* Left: Hero Content */}
+            <div className="text-white">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+                Plan a trip in{' '}
+                <span className="bg-white text-primary px-4 py-2 rounded-xl inline-block transform -rotate-1">
+                  seconds
+                </span>
               </h1>
-              <p className="text-lg mb-12">
-                Discover amazing destinations and create unforgettable memories with our
-                easy-to-use travel planning tools.
+              <p className="text-lg sm:text-xl text-white/90 mb-8 leading-relaxed max-w-lg">
+                Skip the endless research. Get personalized itineraries powered by AI that match your style, budget, and time.
               </p>
-              <div className="flex flex-col sm:flex-row gap-8">
-                <Link
-                  href="/trips"
-                  className="bg-accent hover:bg-accent/90 text-white font-medium py-12 px-24 rounded-2xl text-center transition-colors"
-                >
-                  Explore Trips
-                </Link>
-                <Link
-                  href="/auth/register"
-                  className="bg-white hover:bg-gray-100 text-primary font-medium py-12 px-24 rounded-2xl text-center transition-colors"
-                >
-                  Sign Up Free
-                </Link>
+              
+              {/* Trust indicators */}
+              <div className="flex flex-wrap items-center gap-6 text-sm text-white/80">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <span>10M+ trips planned</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <span>95% satisfaction rate</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <span>Free to use</span>
+                </div>
               </div>
             </div>
-            <div className="hidden md:block">
-              {/* Placeholder for hero image */}
-              <div className="bg-white/20 rounded-2xl h-80 w-full flex items-center justify-center">
-                {/* Replace with actual image when available */}
-                <p className="text-white/70 text-center">
-                  {/* Integration point: Hero image */}
-                  Travel illustration or map visualization will go here
-                </p>
-              </div>
+
+            {/* Right: Trip Form */}
+            <div className="flex justify-center lg:justify-end">
+              <TripForm />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-24">
-        <div className="max-w-7xl mx-auto px-16">
-          <h2 className="text-3xl font-bold text-center mb-16">Why Choose TravelPlanner</h2>
+      {/* How It Works Section */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              How Travel Link Works
+            </h2>
+            <p className="text-lg text-muted max-w-2xl mx-auto">
+              From idea to itinerary in three simple steps
+            </p>
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
-            <div className="bg-white p-16 rounded-2xl shadow-sm border border-gray-100">
-              <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-8">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+            {/* Step 1 */}
+            <div className="text-center">
+              <div className="bg-primary/10 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-8">Interactive Maps</h3>
+              <div className="mb-4">
+                <span className="inline-block bg-primary text-white text-sm font-bold px-3 py-1 rounded-full mb-2">
+                  Step 1
+                </span>
+                <h3 className="text-xl font-semibold text-gray-900">Tell us your preferences</h3>
+              </div>
               <p className="text-muted">
-                Visualize your journey with our interactive maps and plan the perfect route.
-                {/* Integration point: Map API */}
+                Share your destination, dates, budget, and travel style. Our AI learns what kind of trip you want.
               </p>
             </div>
-            
-            <div className="bg-white p-16 rounded-2xl shadow-sm border border-gray-100">
-              <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-8">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+
+            {/* Step 2 */}
+            <div className="text-center">
+              <div className="bg-accent/10 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-8">Smart Itineraries</h3>
+              <div className="mb-4">
+                <span className="inline-block bg-accent text-white text-sm font-bold px-3 py-1 rounded-full mb-2">
+                  Step 2
+                </span>
+                <h3 className="text-xl font-semibold text-gray-900">AI generates your itinerary</h3>
+              </div>
               <p className="text-muted">
-                Create detailed day-by-day itineraries with activities, accommodations, and transportation.
-                {/* Integration point: Calendar API */}
+                Get a personalized day-by-day plan with activities, restaurants, and hidden gems tailored to your style.
               </p>
             </div>
-            
-            <div className="bg-white p-16 rounded-2xl shadow-sm border border-gray-100">
-              <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-8">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+
+            {/* Step 3 */}
+            <div className="text-center">
+              <div className="bg-green-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-8">Collaboration</h3>
+              <div className="mb-4">
+                <span className="inline-block bg-green-600 text-white text-sm font-bold px-3 py-1 rounded-full mb-2">
+                  Step 3
+                </span>
+                <h3 className="text-xl font-semibold text-gray-900">Book and enjoy your trip</h3>
+              </div>
               <p className="text-muted">
-                Plan trips with friends and family by sharing and collaborating on itineraries.
-                {/* Integration point: Sharing API */}
+                Customize your itinerary, book accommodations and activities, then enjoy your perfectly planned adventure.
               </p>
             </div>
+          </div>
+          
+          {/* CTA */}
+          <div className="text-center mt-16">
+            <Link
+              href="/planner"
+              className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-semibold px-8 py-4 rounded-xl transition-colors"
+            >
+              Start Planning Your Trip
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>
