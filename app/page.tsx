@@ -82,7 +82,22 @@ export default function Home() {
       }
 
       const data = await response.json()
-      setItinerary(data.itinerary)
+
+      // Ensure all arrays are initialized
+      const validatedItinerary = {
+        ...data.itinerary,
+        dailyItinerary: data.itinerary.dailyItinerary || [],
+        accommodations: data.itinerary.accommodations || [],
+        transportation: data.itinerary.transportation || [],
+        tips: data.itinerary.tips || [],
+      }
+
+      validatedItinerary.dailyItinerary = validatedItinerary.dailyItinerary.map((day: any) => ({
+        ...day,
+        activities: day.activities || [],
+      }))
+
+      setItinerary(validatedItinerary)
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
     } finally {

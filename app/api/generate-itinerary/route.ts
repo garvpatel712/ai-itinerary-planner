@@ -24,11 +24,37 @@ export async function POST(req: NextRequest) {
       throw new Error(`Webhook request failed with status ${webhookResponse.status}`);
     }
 
-    // Parse the JSON response from the webhook, which should contain the itinerary
+    // Parse the JSON response from the webhook
     const itineraryData = await webhookResponse.json();
 
-    // Send the itinerary data back to the frontend
-    return NextResponse.json({ itinerary: itineraryData });
+    // Validate and structure the itinerary data
+    const validatedItinerary = {
+      destination: itineraryData.destination || 'Unknown Destination',
+      duration: itineraryData.duration || 'N/A',
+      totalBudget: itineraryData.totalBudget || 0,
+      dailyItinerary: (itineraryData.dailyItinerary || []).map((day: any) => ({
+        ...(day || {}),
+        activities: (day?.activities || []).map((activity: any) => ({
+          ...(activity || {}),
+        })),
+      })),
+      accommodations: (itineraryData.accommodations || []).map((acc: any) => ({
+        ...(acc || {}),
+        amenities: acc?.amenities || [],
+      })),
+      transportation: itineraryData.transportation || [],
+      budgetBreakdown: itineraryData.budgetBreakdown || {
+        accommodation: 0,
+        transportation: 0,
+        activities: 0,
+        food: 0,
+        miscellaneous: 0,
+      },
+      tips: itineraryData.tips || [],
+    };
+
+    // Send the validated and structured itinerary data back to the frontend
+    return NextResponse.json({ itinerary: validatedItinerary });
 
   } catch (error) {
     console.error('Error in generate-itinerary route:', error);

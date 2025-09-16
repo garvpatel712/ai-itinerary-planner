@@ -140,7 +140,7 @@ export function ItineraryDisplay({ itinerary, onReset }: ItineraryDisplayProps) 
 
         {/* Daily Itinerary Tab */}
         <TabsContent value="itinerary" className="space-y-6">
-          {itinerary.dailyItinerary.map((day) => (
+          {itinerary.dailyItinerary?.map((day) => (
             <Card key={day.day}>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -156,7 +156,7 @@ export function ItineraryDisplay({ itinerary, onReset }: ItineraryDisplayProps) 
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {day.activities.map((activity, index) => (
+                  {day.activities?.map((activity, index) => (
                     <div key={index} className="flex gap-4 p-4 rounded-lg bg-muted/50">
                       <div className="flex flex-col items-center gap-1 min-w-[60px]">
                         <Clock className="h-4 w-4 text-muted-foreground" />
@@ -194,7 +194,7 @@ export function ItineraryDisplay({ itinerary, onReset }: ItineraryDisplayProps) 
         {/* Accommodations Tab */}
         <TabsContent value="accommodations" className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
-            {itinerary.accommodations.map((accommodation, index) => (
+            {itinerary.accommodations?.map((accommodation, index) => (
               <Card key={index}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -227,7 +227,7 @@ export function ItineraryDisplay({ itinerary, onReset }: ItineraryDisplayProps) 
                   <div>
                     <h5 className="font-medium mb-2">Amenities</h5>
                     <div className="flex flex-wrap gap-1">
-                      {accommodation.amenities.map((amenity, amenityIndex) => (
+                      {accommodation.amenities?.map((amenity, amenityIndex) => (
                         <Badge key={amenityIndex} variant="secondary" className="text-xs">
                           {amenity}
                         </Badge>
@@ -243,7 +243,7 @@ export function ItineraryDisplay({ itinerary, onReset }: ItineraryDisplayProps) 
         {/* Transportation Tab */}
         <TabsContent value="transportation" className="space-y-6">
           <div className="space-y-4">
-            {itinerary.transportation.map((transport, index) => {
+            {itinerary.transportation?.map((transport, index) => {
               const IconComponent = transportIcons[transport.type as keyof typeof transportIcons] || Car
               return (
                 <Card key={index}>
@@ -285,10 +285,10 @@ export function ItineraryDisplay({ itinerary, onReset }: ItineraryDisplayProps) 
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {Object.entries(itinerary.budgetBreakdown).map(([category, amount]) => (
+                {itinerary.budgetBreakdown && Object.entries(itinerary.budgetBreakdown)?.map(([category, amount]) => (
                   <div key={category} className="flex items-center justify-between">
                     <span className="capitalize font-medium">{category}</span>
-                    <span className="font-semibold">{formatCurrency(amount)}</span>
+                    <span className="font-semibold">{formatCurrency(amount as number)}</span>
                   </div>
                 ))}
                 <Separator />
@@ -309,7 +309,7 @@ export function ItineraryDisplay({ itinerary, onReset }: ItineraryDisplayProps) 
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3">
-                  {itinerary.tips.map((tip, index) => (
+                  {itinerary.tips?.map((tip, index) => (
                     <li key={index} className="flex gap-2 text-sm">
                       <span className="text-primary font-bold">•</span>
                       <span>{tip}</span>
