@@ -1,30 +1,39 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.json();
 
+    // The webhook URL that will receive the form data and return the itinerary
     const webhookUrl = 'http://localhost:5678/webhook-test/1f3c415d-a7ec-47ac-a2ce-1cabfe2fdd2d';
 
-    const response = await fetch(webhookUrl, {
+    // Send the form data to the webhook
+    const webhookResponse = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ data: formData }),
+      // Send the form data directly as the request body
+      body: JSON.stringify(formData),
     });
 
-    if (!response.ok) {
-      throw new Error(`Webhook request failed with status ${response.status}`);
+    // Check if the webhook responded successfully
+    if (!webhookResponse.ok) {
+      const errorBody = await webhookResponse.text();
+      console.error(`Webhook request failed with status ${webhookResponse.status}:`, errorBody);
+      throw new Error(`Webhook request failed with status ${webhookResponse.status}`);
     }
 
-    // Since we are not generating an itinerary anymore, we can return a simple success message.
-    // Also, the original code returned an object with an `itinerary` property,
-    // which the frontend might be expecting. Returning an empty object for now.
-    return NextResponse.json({ itinerary: {} });
+    // Parse the JSON response from the webhook, which should contain the itinerary
+    const itineraryData = await webhookResponse.json();
+
+    // Send the itinerary data back to the frontend
+    return NextResponse.json({ itinerary: itineraryData });
+
   } catch (error) {
-    console.error('Error triggering webhook:', error);
-    return NextResponse.json({ error: 'Failed to trigger webhook' }, { status: 500 });
+    console.error('Error in generate-itinerary route:', error);
+    // Return a more informative error message to the frontend
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    return NextResponse.json({ error: `Failed to process itinerary request: ${errorMessage}` }, { status: 500 });
   }
 }
