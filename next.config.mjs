@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  env: {
+    GOOGLE_GENERATIVE_AI_API_KEY: "AIzaSyDfoZfrYIlOjPWdiGMIqjcmclKwREWMiKg",
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
