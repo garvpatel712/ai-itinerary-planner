@@ -15,8 +15,13 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useAuth } from "../lib/useAuth"
 import { signOut } from "../lib/auth"
+import { User as SupabaseUser } from "@supabase/supabase-js"
 
-export function Header() {
+interface HeaderProps {
+  user: SupabaseUser | null
+}
+
+export function Header({ user: initialUser }: HeaderProps) {
   const { user, loading } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -30,6 +35,8 @@ export function Header() {
     await signOut()
     window.location.href = "/login"
   }
+
+  const finalUser = user ?? initialUser
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -58,12 +65,12 @@ export function Header() {
           <div className="flex items-center gap-4">
             {loading ? (
               <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
-            ) : user ? (
+            ) : finalUser ? (
               <Link href="/dashboard">
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback className="bg-primary text-primary-foreground">
-                      {user.email ? user.email.charAt(0).toUpperCase() : <User />}
+                      {finalUser.email ? finalUser.email.charAt(0).toUpperCase() : <User />}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -99,7 +106,7 @@ export function Header() {
                       {item.name}
                     </Link>
                   ))}
-                  {!user && !loading && (
+                  {!finalUser && !loading && (
                     <div className="flex flex-col gap-2 pt-4">
                       <Button variant="ghost" asChild>
                         <Link href="/login" onClick={() => setIsOpen(false)}>

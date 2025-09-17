@@ -18,46 +18,35 @@ interface TravelPreferences {
 
 interface Itinerary {
   destination: string
-  duration: string
-  totalBudget: number
-  dailyItinerary: Array<{
+  budget: number
+  duration: number
+  itinerary: Array<{
     day: number
-    date: string
     activities: Array<{
       time: string
       activity: string
-      location: string
       cost: number
-      description: string
-      category: string
     }>
-    dailyBudget: number
   }>
-  accommodations: Array<{
+  accommodationOptions: Array<{
     name: string
     type: string
     pricePerNight: number
-    rating: number
     location: string
     amenities: string[]
-    description: string
   }>
-  transportation: Array<{
-    type: string
-    from: string
-    to: string
-    cost: number
-    duration: string
-    description: string
-  }>
-  budgetBreakdown: {
-    accommodation: number
-    transportation: number
-    activities: number
-    food: number
-    miscellaneous: number
+  transportation: {
+    toDestination: string
+    localTransport: string
   }
-  tips: string[]
+  budgetBreakdown: {
+    travel: number
+    accommodation: number
+    food: number
+    activities: number
+    misc: number
+  }
+  travelTips: string[]
 }
 
 export default function Home() {
@@ -87,13 +76,13 @@ export default function Home() {
       // Ensure all arrays are initialized
       const validatedItinerary = {
         ...data.itinerary,
-        dailyItinerary: data.itinerary.dailyItinerary || [],
-        accommodations: data.itinerary.accommodations || [],
-        transportation: data.itinerary.transportation || [],
-        tips: data.itinerary.tips || [],
+        itinerary: data.itinerary.itinerary || [],
+        accommodationOptions: data.itinerary.accommodationOptions || [],
+        transportation: data.itinerary.transportation || { toDestination: "", localTransport: "" },
+        travelTips: data.itinerary.travelTips || [],
       }
 
-      validatedItinerary.dailyItinerary = validatedItinerary.dailyItinerary.map((day: any) => ({
+      validatedItinerary.itinerary = validatedItinerary.itinerary.map((day: any) => ({
         ...day,
         activities: day.activities || [],
       }))
