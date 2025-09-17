@@ -56,9 +56,9 @@ export function AccommodationCard({
   const [isFavorited, setIsFavorited] = useState(false)
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-IN", {
       style: "currency",
-      currency: "USD",
+      currency: "INR",
     }).format(amount)
   }
 

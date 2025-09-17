@@ -3,7 +3,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Plane, Train, Bus, Car, Clock, MapPin, DollarSign, Zap, Leaf } from "lucide-react"
+import { Plane, Train, Bus, Car, Clock, MapPin, Zap, Leaf } from "lucide-react"
+import { FaRupeeSign } from "react-icons/fa"
 
 interface Transportation {
   type: string
@@ -67,9 +68,9 @@ export function TransportationCard({
   const speedBadge = getSpeedBadge(transportation.type)
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-IN", {
       style: "currency",
-      currency: "USD",
+      currency: "INR",
     }).format(amount)
   }
 
@@ -161,7 +162,7 @@ export function TransportationCard({
         {/* Price and Actions */}
         <div className="flex items-center justify-between pt-3 border-t">
           <div className="flex items-center gap-1">
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <FaRupeeSign className="h-4 w-4 text-muted-foreground" />
             <span className="text-2xl font-bold">{formatCurrency(transportation.cost)}</span>
           </div>
           <div className="flex gap-2">

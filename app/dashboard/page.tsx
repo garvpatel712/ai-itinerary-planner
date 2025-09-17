@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MapPin, Calendar, DollarSign, Clock, Plane, Plus, Eye, Trash2, Star } from "lucide-react"
+import { MapPin, Calendar, Clock, Plane, Plus, Eye, Trash2, Star } from "lucide-react"
+import { FaRupeeSign } from "react-icons/fa"
 
 // Mock data for user's itineraries
 const mockItineraries = [
@@ -13,7 +14,7 @@ const mockItineraries = [
     id: 1,
     destination: "Tokyo, Japan",
     duration: "7 days",
-    budget: 2500,
+    budget: 200000,
     status: "completed",
     createdAt: "2024-01-15",
     rating: 5,
@@ -22,7 +23,7 @@ const mockItineraries = [
     id: 2,
     destination: "Paris, France",
     duration: "5 days",
-    budget: 1800,
+    budget: 150000,
     status: "upcoming",
     createdAt: "2024-02-01",
     rating: null,
@@ -31,7 +32,7 @@ const mockItineraries = [
     id: 3,
     destination: "Bali, Indonesia",
     duration: "10 days",
-    budget: 1200,
+    budget: 100000,
     status: "draft",
     createdAt: "2024-02-10",
     rating: null,
@@ -40,7 +41,7 @@ const mockItineraries = [
 
 const mockStats = {
   totalTrips: 12,
-  totalSpent: 18500,
+  totalSpent: 1500000,
   favoriteDestination: "Japan",
   nextTrip: "Paris, France",
 }
@@ -86,10 +87,10 @@ export default function DashboardPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <FaRupeeSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${mockStats.totalSpent.toLocaleString()}</div>
+              <div className="text-2xl font-bold">₹{mockStats.totalSpent.toLocaleString("en-IN")}</div>
               <p className="text-xs text-muted-foreground">Across all trips</p>
             </CardContent>
           </Card>
@@ -148,7 +149,8 @@ export default function DashboardPage() {
                             {itinerary.duration}
                           </span>
                           <span className="flex items-center gap-1">
-                            <DollarSign className="h-4 w-4" />${itinerary.budget}
+                            <FaRupeeSign className="h-4 w-4" />
+                            {itinerary.budget.toLocaleString("en-IN")}
                           </span>
                           <span className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />

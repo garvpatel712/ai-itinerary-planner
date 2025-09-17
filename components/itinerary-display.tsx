@@ -10,7 +10,6 @@ import {
   Calendar,
   Clock,
   MapPin,
-  DollarSign,
   Star,
   Lightbulb,
   Download,
@@ -21,6 +20,7 @@ import {
   Train,
   Bus,
 } from "lucide-react"
+import { FaRupeeSign } from "react-icons/fa"
 
 // This is the old interface, we'll keep it for reference or potential future use
 interface OldItinerary {
@@ -129,9 +129,9 @@ export function ItineraryDisplay({ itinerary, onReset }: ItineraryDisplayProps) 
   const [activeTab, setActiveTab] = useState("itinerary")
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-IN", {
       style: "currency",
-      currency: "USD",
+      currency: "INR",
     }).format(amount)
   }
 
@@ -286,7 +286,7 @@ export function ItineraryDisplay({ itinerary, onReset }: ItineraryDisplayProps) 
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-primary" />
+                  <FaRupeeSign className="h-5 w-5 text-primary" />
                   Budget Breakdown
                 </CardTitle>
               </CardHeader>

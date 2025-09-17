@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
-import { MapPin, DollarSign, Calendar, Users, Heart, Loader2 } from "lucide-react"
+import { MapPin, Calendar, Users, Heart, Loader2 } from "lucide-react"
+import { FaRupeeSign } from "react-icons/fa"
 
 interface TravelPreferences {
   destination: string
@@ -21,7 +22,7 @@ interface TravelPreferences {
 
 interface TravelFormProps {
   onSubmit: (preferences: TravelPreferences) => void
-  isLoading?: boolean // <-- Add isLoading prop
+  isLoading?: boolean
 }
 
 const interestOptions = [
@@ -135,13 +136,13 @@ export function TravelForm({ onSubmit, isLoading = false }: TravelFormProps) {
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="budget" className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-primary" />
-                  Total Budget (USD)
+                  <FaRupeeSign className="h-4 w-4 text-primary" />
+                  Total Budget (INR)
                 </Label>
                 <Input
                   id="budget"
                   type="number"
-                  placeholder="e.g., 2000"
+                  placeholder="e.g., 150000"
                   value={formData.budget}
                   onChange={(e) => setFormData((prev) => ({ ...prev, budget: e.target.value }))}
                   className={errors.budget ? "border-destructive" : ""}

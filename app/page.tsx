@@ -5,6 +5,7 @@ import { TravelForm } from "@/components/travel-form"
 import { ItineraryDisplay } from "@/components/itinerary-display"
 import { LoadingState } from "@/components/loading-state"
 import { Plane, MapPin, Calendar } from "lucide-react"
+import { FaRupeeSign } from "react-icons/fa"
 
 interface TravelPreferences {
   destination: string
@@ -144,7 +145,7 @@ export default function Home() {
             </div>
             <div className="bg-card rounded-lg p-6 text-center">
               <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center mx-auto mb-3">
-                <span className="text-primary-foreground font-bold text-sm">$</span>
+                <FaRupeeSign className="text-primary-foreground h-5 w-5" />
               </div>
               <h3 className="font-semibold mb-2">Budget Optimization</h3>
               <p className="text-sm text-muted-foreground">
