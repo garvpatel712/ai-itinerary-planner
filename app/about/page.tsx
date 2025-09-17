@@ -28,24 +28,19 @@ export default function AboutPage() {
 
   const team = [
     {
-      name: "Sarah Johnson",
-      role: "CEO & Founder",
-      description: "Former travel industry executive with 15+ years of experience in hospitality and technology.",
+      name: "Shlok Patel",
+      role: "Project Manager",
+      description: "Strategic leader who oversees the entire project lifecycle, ensuring the team stays on track to deliver a successful product.",
     },
     {
-      name: "Michael Chen",
-      role: "CTO",
-      description: "AI researcher and software engineer specializing in machine learning and travel optimization.",
+      name: "Garv Patel",
+      role: "Full Stack Developer",
+      description: "Versatile coder who builds and maintains both the user-facing and server-side components of the application.",
     },
     {
-      name: "Emily Rodriguez",
-      role: "Head of Product",
-      description: "UX designer and product strategist passionate about creating seamless travel experiences.",
-    },
-    {
-      name: "David Kim",
-      role: "Travel Expert",
-      description: "Professional travel consultant with expertise in global destinations and cultural experiences.",
+      name: "Jigar Prajapati",
+      role: "UI/UX Designer",
+      description: "Creative problem-solver focused on designing intuitive, accessible, and visually appealing user experiences.",
     },
   ]
 
@@ -170,7 +165,7 @@ export default function AboutPage() {
               experiences.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
             {team.map((member, index) => (
               <Card key={index}>
                 <CardContent className="p-6 text-center">
