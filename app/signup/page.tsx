@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Plane, Eye, EyeOff } from "lucide-react"
+import { signUp } from "../../lib/auth"
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -24,6 +25,7 @@ export default function SignupPage() {
   const [acceptTerms, setAcceptTerms] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({
@@ -36,6 +38,7 @@ export default function SignupPage() {
     e.preventDefault()
     setIsLoading(true)
     setError("")
+    setSuccess("")
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match")
@@ -50,14 +53,13 @@ export default function SignupPage() {
     }
 
     try {
-      // TODO: Implement actual registration logic
-      console.log("Signup attempt:", formData)
+      const { error } = await signUp(formData.email, formData.password)
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // For demo purposes, redirect to dashboard
-      window.location.href = "/dashboard"
+      if (error) {
+        setError(error.message)
+      } else {
+        setSuccess("Account created successfully! Please check your email for a confirmation link.")
+      }
     } catch (err) {
       setError("Failed to create account. Please try again.")
     } finally {
@@ -80,6 +82,11 @@ export default function SignupPage() {
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            {success && (
+              <Alert>
+                <AlertDescription>{success}</AlertDescription>
               </Alert>
             )}
 

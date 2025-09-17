@@ -13,16 +13,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useAuth } from "../lib/useAuth"
+import { signOut } from "../lib/auth"
 
-interface HeaderProps {
-  user?: {
-    name: string
-    email: string
-    role: "user" | "admin"
-  } | null
-}
-
-export function Header({ user }: HeaderProps) {
+export function Header() {
+  const { user, loading } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
 
   const navigation = [
@@ -31,9 +26,9 @@ export function Header({ user }: HeaderProps) {
     { name: "Contact", href: "/contact" },
   ]
 
-  const handleLogout = () => {
-    // TODO: Implement logout logic
-    console.log("Logout clicked")
+  const handleLogout = async () => {
+    await signOut()
+    window.location.href = "/login"
   }
 
   return (
@@ -61,13 +56,15 @@ export function Header({ user }: HeaderProps) {
 
           {/* User Actions */}
           <div className="flex items-center gap-4">
-            {user ? (
+            {loading ? (
+              <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
+            ) : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="bg-primary text-primary-foreground">
-                        {user.name.charAt(0).toUpperCase()}
+                        {user.email ? user.email.charAt(0).toUpperCase() : <User />}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -75,15 +72,14 @@ export function Header({ user }: HeaderProps) {
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{user.name}</p>
-                      <p className="w-[200px] truncate text-sm text-muted-foreground">{user.email}</p>
+                      <p className="font-medium">{user.email}</p>
                     </div>
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href={user.role === "admin" ? "/admin" : "/dashboard"}>
+                    <Link href="/dashboard">
                       <User className="mr-2 h-4 w-4" />
-                      <span>{user.role === "admin" ? "Admin Dashboard" : "Dashboard"}</span>
+                      <span>Dashboard</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -124,7 +120,7 @@ export function Header({ user }: HeaderProps) {
                       {item.name}
                     </Link>
                   ))}
-                  {!user && (
+                  {!user && !loading && (
                     <div className="flex flex-col gap-2 pt-4">
                       <Button variant="ghost" asChild>
                         <Link href="/login" onClick={() => setIsOpen(false)}>

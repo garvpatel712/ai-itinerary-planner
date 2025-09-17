@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Plane, Eye, EyeOff } from "lucide-react"
+import { signIn } from "../../lib/auth"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -24,14 +25,13 @@ export default function LoginPage() {
     setError("")
 
     try {
-      // TODO: Implement actual authentication logic
-      console.log("Login attempt:", { email, password })
+      const { error } = await signIn(email, password)
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // For demo purposes, redirect to dashboard
-      window.location.href = "/dashboard"
+      if (error) {
+        setError(error.message)
+      } else {
+        window.location.href = "/dashboard"
+      }
     } catch (err) {
       setError("Invalid email or password")
     } finally {
