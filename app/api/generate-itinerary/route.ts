@@ -6,6 +6,10 @@ export async function POST(req: NextRequest) {
 
     // The webhook URL that will receive the form data and return the itinerary
     const webhookUrl = 'http://localhost:5678/webhook-test/1f3c415d-a7ec-47ac-a2ce-1cabfe2fdd2d';
+    
+    if (webhookUrl.includes('localhost:5678/webhook-test')) {
+      console.warn('Using a default test webhook URL. Please replace with your actual webhook URL.');
+    }
 
     // Send the form data to the webhook
     const webhookResponse = await fetch(webhookUrl, {
@@ -24,8 +28,19 @@ export async function POST(req: NextRequest) {
       throw new Error(`Webhook request failed with status ${webhookResponse.status}`);
     }
 
-    // Parse the JSON response from the webhook
-    const itineraryData = await webhookResponse.json();
+    const responseText = await webhookResponse.text();
+
+    if (!responseText) {
+      throw new Error('Webhook responded with empty body');
+    }
+
+    let itineraryData;
+    try {
+      itineraryData = JSON.parse(responseText);
+    } catch (e) {
+      console.error('Failed to parse webhook response as JSON:', responseText);
+      throw new Error('Failed to parse itinerary data from webhook.');
+    }
 
     // Validate and structure the itinerary data
     const validatedItinerary = {
