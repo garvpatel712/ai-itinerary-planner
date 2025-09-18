@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
               ]},
               { day: 2, date: '2024-07-28', theme: 'Museum Day', activities: [
                   { time: '10:00 AM', description: 'Louvre Museum', cost: 20 },
-                  { time: '2:00 PM', description: 'Musée d'Orsay', cost: 16 },
+                  { time: '2:00 PM', description: 'Musée d\'Orsay', cost: 16 },
               ]},
           ],
           accommodations: [
