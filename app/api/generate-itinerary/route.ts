@@ -33,38 +33,41 @@ export async function POST(req: NextRequest) {
       throw new Error('Failed to parse itinerary data from webhook.');
     }
 
+    // Handle cases where the itinerary data is nested inside an 'itinerary' property.
+    const sourceData = rawItineraryData.itinerary || rawItineraryData;
+
     // Map the webhook data to the structure expected by the frontend component.
     const mappedItinerary = {
-      destination: rawItineraryData.destination,
-      budget: rawItineraryData.totalBudget, // The component expects 'budget'
-      duration: parseInt(rawItineraryData.duration, 10) || 0, // The component expects a number
-      itinerary: rawItineraryData.dailyItinerary?.map((day: any) => ({
+      destination: sourceData.destination,
+      budget: parseFloat(sourceData.totalBudget) || 0, // Ensure budget is a number
+      duration: parseInt(sourceData.duration, 10) || 0, // Ensure duration is a number
+      itinerary: sourceData.dailyItinerary?.map((day: any) => ({
         day: day.day,
         activities: day.activities?.map((activity: any) => ({
           time: activity.time,
-          activity: activity.activity || activity.description, // The component expects 'activity'
+          activity: activity.activity || activity.description,
           cost: activity.cost,
         })),
       })),
-      accommodationOptions: rawItineraryData.accommodations?.map((acc: any) => ({
+      accommodationOptions: sourceData.accommodations?.map((acc: any) => ({
         name: acc.name,
         type: acc.type,
-        pricePerNight: acc.price, // The component expects 'pricePerNight'
+        pricePerNight: acc.price,
         location: acc.location,
         amenities: acc.amenities,
       })),
       transportation: {
-        toDestination: rawItineraryData.transportation?.find((t: any) => t.type === 'Flight')?.details || 'Not available',
-        localTransport: rawItineraryData.transportation?.find((t: any) => t.type === 'Metro')?.details || 'Not available',
+        toDestination: sourceData.transportation?.find((t: any) => t.type === 'Flight')?.details || 'Not available',
+        localTransport: sourceData.transportation?.find((t: any) => t.type === 'Metro')?.details || 'Not available',
       },
       budgetBreakdown: {
-        travel: rawItineraryData.budgetBreakdown?.transportation, // The component expects 'travel'
-        accommodation: rawItineraryData.budgetBreakdown?.accommodation,
-        food: rawItineraryData.budgetBreakdown?.food,
-        activities: rawItineraryData.budgetBreakdown?.activities,
-        misc: rawItineraryData.budgetBreakdown?.miscellaneous, // The component expects 'misc'
+        travel: sourceData.budgetBreakdown?.transportation,
+        accommodation: sourceData.budgetBreakdown?.accommodation,
+        food: sourceData.budgetBreakdown?.food,
+        activities: sourceData.budgetBreakdown?.activities,
+        misc: sourceData.budgetBreakdown?.miscellaneous,
       },
-      travelTips: rawItineraryData.tips, // The component expects 'travelTips'
+      travelTips: sourceData.tips,
     };
 
     return NextResponse.json({ itinerary: mappedItinerary });
