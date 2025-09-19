@@ -18,35 +18,46 @@ interface TravelPreferences {
 
 interface Itinerary {
   destination: string
-  budget: number
-  duration: number
-  itinerary: Array<{
+  duration: string
+  totalBudget: number
+  dailyItinerary: Array<{
     day: number
+    date: string
     activities: Array<{
       time: string
       activity: string
+      location: string
       cost: number
+      description: string
+      category: string
     }>
+    dailyBudget: number
   }>
-  accommodationOptions: Array<{
+  accommodations: Array<{
     name: string
     type: string
     pricePerNight: number
+    rating: number
     location: string
     amenities: string[]
+    description: string
   }>
-  transportation: {
-    toDestination: string
-    localTransport: string
-  }
+  transportation: Array<{
+    type: string
+    from: string
+    to: string
+    cost: number
+    duration: string
+    description: string
+  }>
   budgetBreakdown: {
-    travel: number
     accommodation: number
-    food: number
+    transportation: number
     activities: number
-    misc: number
+    food: number
+    miscellaneous: number
   }
-  travelTips: string[]
+  tips: string[]
 }
 
 export default function Home() {
@@ -76,13 +87,13 @@ export default function Home() {
       // Ensure all arrays are initialized
       const validatedItinerary = {
         ...data.itinerary,
-        itinerary: data.itinerary.itinerary || [],
-        accommodationOptions: data.itinerary.accommodationOptions || [],
-        transportation: data.itinerary.transportation || { toDestination: "", localTransport: "" },
-        travelTips: data.itinerary.travelTips || [],
+        dailyItinerary: data.itinerary.dailyItinerary || [],
+        accommodations: data.itinerary.accommodations || [],
+        transportation: data.itinerary.transportation || [],
+        tips: data.itinerary.tips || [],
       }
 
-      validatedItinerary.itinerary = validatedItinerary.itinerary.map((day: any) => ({
+      validatedItinerary.dailyItinerary = validatedItinerary.dailyItinerary.map((day: any) => ({
         ...day,
         activities: day.activities || [],
       }))
