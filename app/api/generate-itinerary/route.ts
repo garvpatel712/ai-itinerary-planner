@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.json();
 
     // The webhook URL that will receive the form data and return the itinerary
-    const webhookUrl = 'http://localhost:5678/webhook-test/1f3c415d-a7ec-47ac-a2ce-1cabfe2fdd2d';
+    const webhookUrl = 'http://localhost:5678/webhook/53faf401-4eed-49d5-b594-02caf601a09a';
 
     // Send the form data to the webhook
     const webhookResponse = await fetch(webhookUrl, {
