@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
     let rawData;
     try {
       rawData = JSON.parse(responseText);
+      console.log(rawData);
     } catch (e) {
       console.error('Failed to parse webhook response as JSON:', responseText);
       throw new Error('Failed to parse itinerary data from webhook.');
@@ -69,6 +70,7 @@ export async function POST(req: NextRequest) {
 
     // The webhook data might be nested. We'll safely access it.
     const sourceData = rawData.itinerary || rawData;
+    console.log('Extracted source data:', sourceData);
 
     // This is the "translator" that maps the webhook data to the frontend's required structure.
     const mappedItinerary: Itinerary = {
