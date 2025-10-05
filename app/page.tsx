@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { TravelForm } from '@/components/travel-form';
 import { ItineraryDisplay } from '@/components/itinerary-display';
 import { LoadingState } from '@/components/loading-state';
 import { Plane, MapPin, Calendar } from 'lucide-react';
 import { FaRupeeSign } from 'react-icons/fa';
 
-// These interfaces define the exact data structure the frontend component expects.
+// Defines the data structure for travel preferences from the form
 interface TravelPreferences {
   destination: string;
   budget: number;
@@ -17,110 +17,36 @@ interface TravelPreferences {
   travelStyle: string;
 }
 
+// Defines the structure for the itinerary data received from the API
 interface Itinerary {
   destination: string;
-  duration: string;
+  duration: number;
   totalBudget: number;
-  dailyItinerary: Array<{
-    day: number;
-    date: string;
-    activities: Array<{
-      time: string;
-      activity: string;
-      location: string;
-      cost: number;
-      description: string;
-      category: string;
-    }>;
-    dailyBudget: number;
-  }>;
-  accommodations: Array<{
-    name: string;
-    type: string;
-    pricePerNight: number;
-    rating: number;
-    location: string;
-    amenities: string[];
-    description: string;
-  }>;
-  transportation: Array<{
-    type: string;
-    from: string;
-    to: string;
-    cost: number;
-    duration: string;
-    description: string;
-  }>;
-  budgetBreakdown: {
-    accommodation: number;
-    transportation: number;
-    activities: number;
-    food: number;
-    miscellaneous: number;
-  };
-  tips: string[];
+  startLocation: string;
+  travelStyle: string;
+  interests: string[];
+  itinerary: any[]; 
+  accommodationOptions: any[];
+  transportation: any;
+  budgetBreakdown: any;
+  travelTips: string[];
 }
 
-
 export default function Home() {
-  const [itinerary, setItinerary] = useState<Itinerary | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [jobId, setJobId] = useState<string | null>(null);
+  // State management for the component
+  const [itinerary, setItinerary] = useState<Itinerary | null>(null); // Holds the generated itinerary
+  const [isLoading, setIsLoading] = useState(false); // Manages the loading state
+  const [error, setError] = useState<string | null>(null); // Holds error messages
 
-  const pollJobStatus = async (id: string) => {
-    try {
-      const response = await fetch(`/api/itinerary-status/${id}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch job status');
-      }
-      const data = await response.json();
-
-      if (data.status === 'completed') {
-        // Ensure all arrays are initialized
-        const validatedItinerary = {
-          ...data.data,
-          dailyItinerary: data.data.dailyItinerary || [],
-          accommodations: data.data.accommodations || [],
-          transportation: data.data.transportation || [],
-          tips: data.data.tips || [],
-        };
-
-        validatedItinerary.dailyItinerary = validatedItinerary.dailyItinerary.map((day: any) => ({
-          ...day,
-          activities: day.activities || [],
-        }));
-
-        setItinerary(validatedItinerary);
-        setIsLoading(false);
-        setJobId(null);
-      } else if (data.status === 'failed') {
-        setError(data.error || 'An unknown error occurred during itinerary generation.');
-        setIsLoading(false);
-        setJobId(null);
-      } else {
-        // If still pending, poll again after a delay
-        setTimeout(() => pollJobStatus(id), 5000);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while polling for job status.');
-      setIsLoading(false);
-      setJobId(null);
-    }
-  };
-
-  useEffect(() => {
-    if (jobId) {
-      pollJobStatus(jobId);
-    }
-  }, [jobId]);
-
+  // Handles the form submission to generate an itinerary
   const handleGenerateItinerary = async (preferences: TravelPreferences) => {
+    // 1. Set loading state and clear previous data/errors
     setIsLoading(true);
     setError(null);
     setItinerary(null);
 
     try {
+      // 2. Make the API call to the backend
       const response = await fetch('/api/generate-itinerary', {
         method: 'POST',
         headers: {
@@ -129,23 +55,35 @@ export default function Home() {
         body: JSON.stringify(preferences),
       });
 
+      // 3. Handle non-successful responses
       if (!response.ok) {
-        throw new Error('Failed to generate itinerary');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate itinerary. Please try again.');
       }
 
+      // 4. Parse the successful response and update state
       const data = await response.json();
-      setJobId(data.jobId);
+      if (data.itinerary) {
+        setItinerary(data.itinerary); // On success, display the itinerary
+      } else {
+        throw new Error('Received invalid data from the server.');
+      }
 
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      // 5. Catch any errors (network, server-side, etc.) and display them
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      setError(errorMessage);
+
+    } finally {
+      // 6. Ensure loading is always turned off after the process completes
       setIsLoading(false);
     }
   };
 
+  // Resets the UI to its initial state
   const handleReset = () => {
     setItinerary(null);
     setError(null);
-    setJobId(null);
     setIsLoading(false);
   };
 
@@ -167,36 +105,30 @@ export default function Home() {
 
           {/* Feature Cards */}
           <div className="grid md:grid-cols-3 gap-6 mb-12">
-            <div className="bg-card rounded-lg p-6 text-center">
-              <MapPin className="h-8 w-8 text-primary mx-auto mb-3" />
-              <h3 className="font-semibold mb-2">Smart Destinations</h3>
-              <p className="text-sm text-muted-foreground">
-                AI-powered recommendations based on your preferences and budget
-              </p>
-            </div>
-            <div className="bg-card rounded-lg p-6 text-center">
-              <Calendar className="h-8 w-8 text-primary mx-auto mb-3" />
-              <h3 className="font-semibold mb-2">Custom Itineraries</h3>
-              <p className="text-sm text-muted-foreground">
-                Day-by-day plans with activities, dining, and transportation
-              </p>
-            </div>
-            <div className="bg-card rounded-lg p-6 text-center">
-              <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center mx-auto mb-3">
-                <FaRupeeSign className="text-primary-foreground h-5 w-5" />
+              <div className="bg-card rounded-lg p-6 text-center">
+                  <MapPin className="h-8 w-8 text-primary mx-auto mb-3" />
+                  <h3 className="font-semibold mb-2">Smart Destinations</h3>
+                  <p className="text-sm text-muted-foreground">AI-powered recommendations based on your preferences and budget</p>
               </div>
-              <h3 className="font-semibold mb-2">Budget Optimization</h3>
-              <p className="text-sm text-muted-foreground">
-                Stay within budget with detailed cost breakdowns and alternatives
-              </p>
-            </div>
+              <div className="bg-card rounded-lg p-6 text-center">
+                  <Calendar className="h-8 w-8 text-primary mx-auto mb-3" />
+                  <h3 className="font-semibold mb-2">Custom Itineraries</h3>
+                  <p className="text-sm text-muted-foreground">Day-by-day plans with activities, dining, and transportation</p>
+              </div>
+              <div className="bg-card rounded-lg p-6 text-center">
+                  <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center mx-auto mb-3">
+                      <FaRupeeSign className="text-primary-foreground h-5 w-5" />
+                  </div>
+                  <h3 className="font-semibold mb-2">Budget Optimization</h3>
+                  <p className="text-sm text-muted-foreground">Stay within budget with detailed cost breakdowns and alternatives</p>
+              </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Main Content: Conditionally renders Form, Loading, Error, or Itinerary */}
       <div className="container mx-auto px-4 py-8">
-        {!itinerary && !isLoading && (
+        {!itinerary && !isLoading && !error && (
           <div className="max-w-2xl mx-auto">
             <TravelForm onSubmit={handleGenerateItinerary} />
           </div>
@@ -205,14 +137,17 @@ export default function Home() {
         {isLoading && <LoadingState />}
 
         {error && (
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-center">
-              <p className="text-destructive font-medium">Error: {error}</p>
-              <button onClick={handleReset} className="mt-2 text-sm text-primary hover:underline">
-                Try again
-              </button>
+            <div className="max-w-2xl mx-auto text-center">
+                <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-6">
+                    <p className="text-destructive font-semibold text-lg">Something went wrong!</p>
+                    <p className="text-destructive/80 mt-2">Error: {error}</p>
+                    <button 
+                        onClick={handleReset} 
+                        className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+                        Try Again
+                    </button>
+                </div>
             </div>
-          </div>
         )}
 
         {itinerary && <ItineraryDisplay itinerary={itinerary} onReset={handleReset} />}
