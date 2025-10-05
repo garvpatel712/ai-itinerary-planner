@@ -17,15 +17,15 @@ interface TravelPreferences {
   travelStyle: string;
 }
 
-// This interface now correctly matches the structure of the data returned from the API
+// This interface now fully matches the detailed structure of the API response
 interface Itinerary {
   destination: string;
   budget: number;
   duration: number;
-  itinerary: any[]; 
-  accommodationOptions: any[];
-  transportation: any;
-  budgetBreakdown: any;
+  itinerary: Array<{ day: number; activities: Array<{ time: string; activity: string; cost: number }> }>;
+  accommodationOptions: Array<{ name: string; type: string; pricePerNight: number; location: string; amenities: string[] }>;
+  transportation: { toDestination: string; localTransport: string };
+  budgetBreakdown: { travel: number; accommodation: number; food: number; activities: number; misc: number };
   travelTips: string[];
 }
 

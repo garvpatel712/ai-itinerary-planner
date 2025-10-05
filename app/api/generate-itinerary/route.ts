@@ -1,15 +1,15 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-// This interface now matches the structure expected by the ItineraryDisplay component.
+// This interface matches the data structure required by the ItineraryDisplay component.
 interface Itinerary {
   destination: string;
   budget: number;
   duration: number;
-  itinerary: any[];
-  accommodationOptions: any[];
-  transportation: any;
-  budgetBreakdown: any;
+  itinerary: Array<{ day: number; activities: Array<{ time: string; activity: string; cost: number }> }>;
+  accommodationOptions: Array<{ name: string; type: string; pricePerNight: number; location: string; amenities: string[] }>;
+  transportation: { toDestination: string; localTransport: string };
+  budgetBreakdown: { travel: number; accommodation: number; food: number; activities: number; misc: number };
   travelTips: string[];
 }
 
@@ -60,12 +60,12 @@ export async function POST(req: NextRequest) {
       : rawData.output || rawData;
 
     if (!itineraryData || typeof itineraryData !== 'object') {
-        console.error('Parsed webhook data is not in the expected format:', itineraryData);
-        throw new Error('Unexpected data structure from webhook.');
+      console.error('Parsed webhook data is not in the expected format:', itineraryData);
+      throw new Error('Unexpected data structure from webhook.');
     }
 
     console.log('Parsing and validating itinerary data...');
-    // Shape the data to match the ItineraryDisplay component's expected props.
+    // Transform the incoming data to match the ItineraryDisplay component's expected structure.
     const finalItinerary: Itinerary = {
       destination: itineraryData.destination,
       budget: itineraryData.budget,
