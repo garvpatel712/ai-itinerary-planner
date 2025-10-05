@@ -1,115 +1,153 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { TravelForm } from "@/components/travel-form"
-import { ItineraryDisplay } from "@/components/itinerary-display"
-import { LoadingState } from "@/components/loading-state"
-import { Plane, MapPin, Calendar } from "lucide-react"
-import { FaRupeeSign } from "react-icons/fa"
+import { useState, useEffect } from 'react';
+import { TravelForm } from '@/components/travel-form';
+import { ItineraryDisplay } from '@/components/itinerary-display';
+import { LoadingState } from '@/components/loading-state';
+import { Plane, MapPin, Calendar } from 'lucide-react';
+import { FaRupeeSign } from 'react-icons/fa';
 
+// These interfaces define the exact data structure the frontend component expects.
 interface TravelPreferences {
-  destination: string
-  budget: number
-  duration: number
-  startLocation: string
-  interests: string[]
-  travelStyle: string
+  destination: string;
+  budget: number;
+  duration: number;
+  startLocation: string;
+  interests: string[];
+  travelStyle: string;
 }
 
 interface Itinerary {
-  destination: string
-  duration: string
-  totalBudget: number
+  destination: string;
+  duration: string;
+  totalBudget: number;
   dailyItinerary: Array<{
-    day: number
-    date: string
+    day: number;
+    date: string;
     activities: Array<{
-      time: string
-      activity: string
-      location: string
-      cost: number
-      description: string
-      category: string
-    }>
-    dailyBudget: number
-  }>
+      time: string;
+      activity: string;
+      location: string;
+      cost: number;
+      description: string;
+      category: string;
+    }>;
+    dailyBudget: number;
+  }>;
   accommodations: Array<{
-    name: string
-    type: string
-    pricePerNight: number
-    rating: number
-    location: string
-    amenities: string[]
-    description: string
-  }>
+    name: string;
+    type: string;
+    pricePerNight: number;
+    rating: number;
+    location: string;
+    amenities: string[];
+    description: string;
+  }>;
   transportation: Array<{
-    type: string
-    from: string
-    to: string
-    cost: number
-    duration: string
-    description: string
-  }>
+    type: string;
+    from: string;
+    to: string;
+    cost: number;
+    duration: string;
+    description: string;
+  }>;
   budgetBreakdown: {
-    accommodation: number
-    transportation: number
-    activities: number
-    food: number
-    miscellaneous: number
-  }
-  tips: string[]
+    accommodation: number;
+    transportation: number;
+    activities: number;
+    food: number;
+    miscellaneous: number;
+  };
+  tips: string[];
 }
 
+
 export default function Home() {
-  const [itinerary, setItinerary] = useState<Itinerary | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [itinerary, setItinerary] = useState<Itinerary | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [jobId, setJobId] = useState<string | null>(null);
+
+  const pollJobStatus = async (id: string) => {
+    try {
+      const response = await fetch(`/api/itinerary-status/${id}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch job status');
+      }
+      const data = await response.json();
+
+      if (data.status === 'completed') {
+        // Ensure all arrays are initialized
+        const validatedItinerary = {
+          ...data.data,
+          dailyItinerary: data.data.dailyItinerary || [],
+          accommodations: data.data.accommodations || [],
+          transportation: data.data.transportation || [],
+          tips: data.data.tips || [],
+        };
+
+        validatedItinerary.dailyItinerary = validatedItinerary.dailyItinerary.map((day: any) => ({
+          ...day,
+          activities: day.activities || [],
+        }));
+
+        setItinerary(validatedItinerary);
+        setIsLoading(false);
+        setJobId(null);
+      } else if (data.status === 'failed') {
+        setError(data.error || 'An unknown error occurred during itinerary generation.');
+        setIsLoading(false);
+        setJobId(null);
+      } else {
+        // If still pending, poll again after a delay
+        setTimeout(() => pollJobStatus(id), 5000);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred while polling for job status.');
+      setIsLoading(false);
+      setJobId(null);
+    }
+  };
+
+  useEffect(() => {
+    if (jobId) {
+      pollJobStatus(jobId);
+    }
+  }, [jobId]);
 
   const handleGenerateItinerary = async (preferences: TravelPreferences) => {
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
+    setItinerary(null);
 
     try {
-      const response = await fetch("/api/generate-itinerary", {
-        method: "POST",
+      const response = await fetch('/api/generate-itinerary', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(preferences),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to generate itinerary")
+        throw new Error('Failed to generate itinerary');
       }
 
-      const data = await response.json()
+      const data = await response.json();
+      setJobId(data.jobId);
 
-      // Ensure all arrays are initialized
-      const validatedItinerary = {
-        ...data.itinerary,
-        dailyItinerary: data.itinerary.dailyItinerary || [],
-        accommodations: data.itinerary.accommodations || [],
-        transportation: data.itinerary.transportation || [],
-        tips: data.itinerary.tips || [],
-      }
-
-      validatedItinerary.dailyItinerary = validatedItinerary.dailyItinerary.map((day: any) => ({
-        ...day,
-        activities: day.activities || [],
-      }))
-
-      setItinerary(validatedItinerary)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-    } finally {
-      setIsLoading(false)
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleReset = () => {
-    setItinerary(null)
-    setError(null)
-  }
+    setItinerary(null);
+    setError(null);
+    setJobId(null);
+    setIsLoading(false);
+  };
 
   return (
     <main className="min-h-screen bg-background">
@@ -180,5 +218,5 @@ export default function Home() {
         {itinerary && <ItineraryDisplay itinerary={itinerary} onReset={handleReset} />}
       </div>
     </main>
-  )
+  );
 }
