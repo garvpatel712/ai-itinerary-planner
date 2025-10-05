@@ -17,14 +17,11 @@ interface TravelPreferences {
   travelStyle: string;
 }
 
-// Defines the structure for the itinerary data received from the API
+// This interface now correctly matches the structure of the data returned from the API
 interface Itinerary {
   destination: string;
+  budget: number;
   duration: number;
-  totalBudget: number;
-  startLocation: string;
-  travelStyle: string;
-  interests: string[];
   itinerary: any[]; 
   accommodationOptions: any[];
   transportation: any;
