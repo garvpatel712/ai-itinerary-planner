@@ -1,10 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
 
 export async function POST(req: NextRequest) {
   try {
     console.log('API route: Received request to generate itinerary');
     const formData = await req.json();
     console.log('API route: Form data received:', formData);
+
+    // Get the authorization header to check for user session
+    const authHeader = req.headers.get('authorization');
+    let user = null;
+    let userEmail = null;
+
+    if (authHeader) {
+      // Create a temporary Supabase client with the user's JWT
+      const tempSupabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          global: {
+            headers: {
+              Authorization: authHeader,
+            },
+          },
+        }
+      );
+
+      // Get the current user
+      const { data: { user: currentUser }, error: userError } = await tempSupabase.auth.getUser();
+      if (currentUser && !userError) {
+        user = currentUser;
+        userEmail = currentUser.email;
+        console.log('API route: Found authenticated user:', userEmail);
+      }
+    } else {
+      console.log('API route: No authorization header found - user not logged in');
+    }
 
     // The webhook URL that will receive the form data and return the itinerary
     const webhookUrl = 'http://localhost:5678/webhook/53faf401-4eed-49d5-b594-02caf601a09a';
@@ -170,6 +202,75 @@ export async function POST(req: NextRequest) {
   };
 
   console.log('API route: Final response itinerary:', JSON.stringify(responseItinerary, null, 2));
+
+  // Store the itinerary in Supabase with user association
+  try {
+    console.log('API route: Attempting to store itinerary in Supabase');
+    
+    // Prepare the data for storage (matching the ACTUAL table structure)
+    // Convert budget to number if it's a string, or use 0 as default
+    const budgetValue = responseItinerary.budget;
+    const budgetNumber = typeof budgetValue === 'string' ? 
+      (budgetValue.includes('₹') ? parseInt(budgetValue.replace(/[^0-9]/g, '')) : 0) : 
+      (typeof budgetValue === 'number' ? budgetValue : 0);
+
+    // Use actual user ID if logged in, otherwise use a special anonymous UUID
+    const userId = user?.id || '00000000-0000-0000-0000-000000000000'; // Anonymous user UUID
+
+    const itineraryRecord = {
+      user_id: userId,
+      destination: responseItinerary.destination,
+      duration: responseItinerary.duration,
+      budget: budgetNumber, // Convert to number for the numeric column
+      summary: responseItinerary.summary || '',
+      startlocation: formData.startLocation || '', // Get from original form data
+      interests: formData.interests || [], // Store interests from the original request
+      travelstyle: formData.travelStyle || '', // Store travel style from original request
+      status: 'draft',
+      itinerary: responseItinerary.itinerary || [],
+      accommodationoptions: responseItinerary.accommodationOptions || [], // Note: lowercase
+      transportation: responseItinerary.transportation || [],
+      budgetbreakdown: responseItinerary.budgetBreakdown || {}, // Note: lowercase
+      traveltips: responseItinerary.travelTips || [], // Note: lowercase
+    };
+
+    console.log('API route: Storing itinerary with user info:', {
+      user_id: itineraryRecord.user_id,
+      destination: itineraryRecord.destination,
+      duration: itineraryRecord.duration,
+      budget: itineraryRecord.budget
+    });
+
+    // Insert into Supabase - this will work once the table has the right columns
+    const { data: insertedItinerary, error: insertError } = await supabase
+      .from('itineraries')
+      .insert([itineraryRecord])
+      .select()
+      .single();
+
+    if (insertError) {
+      console.error('API route: Error storing itinerary in Supabase:', insertError);
+      console.error('API route: Error details - Code:', insertError.code, 'Message:', insertError.message);
+      
+      // Provide specific guidance based on error type
+      if (insertError.message.includes('column')) {
+        console.error('API route: COLUMN ERROR - The table structure is wrong!');
+        console.error('API route: Please run the SQL script in supabase/final_fix_itineraries_table.sql');
+      } else if (insertError.message.includes('policy')) {
+        console.error('API route: POLICY ERROR - RLS policies are blocking the insert!');
+        console.error('API route: Please check RLS policies in Supabase dashboard');
+      }
+      
+      // Continue even if storage fails - we still want to return the itinerary
+    } else {
+      console.log('API route: Successfully stored itinerary with ID:', insertedItinerary?.id);
+      console.log('API route: Storage confirmed - itinerary saved to database');
+    }
+  } catch (storageError) {
+    console.error('API route: Exception while storing itinerary:', storageError);
+    console.error('API route: Storage failed but continuing to return itinerary');
+    // Continue even if storage fails - we still want to return the itinerary
+  }
 
   // Send the validated and structured itinerary data back to the frontend
     console.log('API route: Sending response back to client');

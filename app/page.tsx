@@ -74,11 +74,21 @@ export default function Home() {
 
     try {
       console.log('Client: Sending request to API route')
+      
+      // Get the current session to include authorization header
+      const { data: { session } } = await supabase.auth.getSession()
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      }
+      
+      // Add authorization header if user is logged in
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`
+      }
+      
       const response = await fetch("/api/generate-itinerary", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         body: JSON.stringify(preferences),
       })
 
