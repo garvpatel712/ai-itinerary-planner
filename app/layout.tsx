@@ -19,13 +19,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  // TODO: Replace with actual user data from authentication context
-  const user = null // This will be replaced with actual auth context
-
   return (
-    <html lang="en">
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        <Header user={user} />
+    <html lang="en" suppressHydrationWarning>
+      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
+        <Header />
         <Suspense fallback={null}>{children}</Suspense>
         <Analytics />
       </body>

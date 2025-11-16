@@ -53,11 +53,26 @@ export default function SignupPage() {
     }
 
     try {
-      const { error } = await signUp(formData.email, formData.password)
+      const { error, data } = await signUp(formData.email, formData.password)
 
       if (error) {
         setError(error.message)
-      } else {
+      } else if (data?.user) {
+        // Create user profile record
+        try {
+          await fetch('/api/user/profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              user_id: data.user.id,
+              name: formData.name,
+              email: formData.email,
+            }),
+          })
+        } catch (profileError) {
+          console.error('Failed to create profile:', profileError)
+        }
+        
         setSuccess("Account created successfully! Please check your email for a confirmation link.")
       }
     } catch (err) {

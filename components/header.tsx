@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -19,6 +19,11 @@ import { signOut } from "../lib/auth"
 export function Header() {
   const { user, loading } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const navigation = [
     { name: "Home", href: "/" },
@@ -56,7 +61,9 @@ export function Header() {
 
           {/* User Actions */}
           <div className="flex items-center gap-4">
-            {loading ? (
+            {!mounted ? (
+              <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
+            ) : loading ? (
               <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
             ) : user ? (
               <Link href="/dashboard">
@@ -99,7 +106,7 @@ export function Header() {
                       {item.name}
                     </Link>
                   ))}
-                  {!user && !loading && (
+                  {!user && !loading && mounted && (
                     <div className="flex flex-col gap-2 pt-4">
                       <Button variant="ghost" asChild>
                         <Link href="/login" onClick={() => setIsOpen(false)}>

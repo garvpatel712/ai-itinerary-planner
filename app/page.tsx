@@ -6,6 +6,8 @@ import { ItineraryDisplay } from "@/components/itinerary-display"
 import { LoadingState } from "@/components/loading-state"
 import { Plane, MapPin, Calendar } from "lucide-react"
 import { FaRupeeSign } from "react-icons/fa"
+import { supabase } from '@/lib/supabaseClient'
+import { createItinerary } from '@/lib/database'
 
 interface TravelPreferences {
   destination: string
@@ -111,6 +113,40 @@ export default function Home() {
 
       console.log('Client: Setting itinerary state with data:', validatedItinerary)
       setItinerary(validatedItinerary)
+
+      // Save itinerary to database client-side if the user is signed in
+      try {
+        const { data: sessionData } = await supabase.auth.getSession()
+        const user = sessionData?.session?.user || null
+
+        if (user) {
+          const payload = {
+            destination: validatedItinerary.destination,
+            duration: validatedItinerary.duration,
+            budget: validatedItinerary.budget ?? validatedItinerary.totalBudget ?? 0,
+            startLocation: preferences.startLocation,
+            interests: preferences.interests,
+            travelStyle: preferences.travelStyle,
+            status: 'draft',
+            itinerary: validatedItinerary.dailyItinerary || validatedItinerary.itinerary || [],
+            accommodationOptions: validatedItinerary.accommodations || validatedItinerary.accommodationOptions || [],
+            transportation: validatedItinerary.transportation || [],
+            budgetBreakdown: validatedItinerary.budgetBreakdown || {},
+            travelTips: validatedItinerary.tips || validatedItinerary.travelTips || [],
+          }
+
+          const { data: saved, error: saveError } = await createItinerary(user.id, payload)
+          if (saveError) {
+            console.error('Failed to save itinerary to database:', saveError)
+          } else {
+            console.log('Itinerary saved to database', saved)
+          }
+        } else {
+          console.log('User not signed in — skipping DB save')
+        }
+      } catch (err) {
+        console.error('Error saving itinerary:', err)
+      }
     } catch (err) {
       console.error('Client: Error in handleGenerateItinerary:', err)
       setError(err instanceof Error ? err.message : "An error occurred")
@@ -191,7 +227,7 @@ export default function Home() {
           </div>
         )}
 
-        {itinerary && <ItineraryDisplay itinerary={itinerary} onReset={handleReset} />}
+        {itinerary && <ItineraryDisplay itinerary={itinerary as any} onReset={handleReset} />}
       </div>
     </main>
   )
