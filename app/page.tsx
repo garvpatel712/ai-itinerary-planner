@@ -68,8 +68,10 @@ export default function Home() {
   const handleGenerateItinerary = async (preferences: TravelPreferences) => {
     setIsLoading(true)
     setError(null)
+    console.log('Client: Submitting travel preferences:', preferences)
 
     try {
+      console.log('Client: Sending request to API route')
       const response = await fetch("/api/generate-itinerary", {
         method: "POST",
         headers: {
@@ -79,12 +81,21 @@ export default function Home() {
       })
 
       if (!response.ok) {
+        console.error('Client: API response not OK, status:', response.status)
         throw new Error("Failed to generate itinerary")
       }
 
+      console.log('Client: Received response from API route')
       const data = await response.json()
+      console.log('Client: Response data structure:', Object.keys(data))
+      
+      if (!data.itinerary) {
+        console.error('Client: No itinerary data in response:', data)
+        throw new Error("No itinerary data received")
+      }
 
       // Ensure all arrays are initialized
+      console.log('Client: Processing itinerary data')
       const validatedItinerary = {
         ...data.itinerary,
         dailyItinerary: data.itinerary.dailyItinerary || [],
@@ -98,11 +109,14 @@ export default function Home() {
         activities: day.activities || [],
       }))
 
+      console.log('Client: Setting itinerary state with data:', validatedItinerary)
       setItinerary(validatedItinerary)
     } catch (err) {
+      console.error('Client: Error in handleGenerateItinerary:', err)
       setError(err instanceof Error ? err.message : "An error occurred")
     } finally {
       setIsLoading(false)
+      console.log('Client: Finished itinerary generation process')
     }
   }
 
