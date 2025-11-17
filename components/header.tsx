@@ -5,13 +5,6 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Plane, Menu, User, LogOut } from "lucide-react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useAuth } from "../lib/useAuth"
 import { signOut } from "../lib/auth"
@@ -66,15 +59,21 @@ export function Header() {
             ) : loading ? (
               <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
             ) : user ? (
-              <Link href="/dashboard">
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      {user.email ? user.email.charAt(0).toUpperCase() : <User />}
-                    </AvatarFallback>
-                  </Avatar>
+              <div className="flex items-center gap-2">
+                <Link href="/dashboard">
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        {(user as any)?.email ? (user as any).email.charAt(0).toUpperCase() : <User />}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </Link>
+                <Button variant="outline" size="sm" onClick={handleLogout}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
                 </Button>
-              </Link>
+              </div>
             ) : (
               <div className="hidden md:flex items-center gap-2">
                 <Button variant="ghost" asChild>

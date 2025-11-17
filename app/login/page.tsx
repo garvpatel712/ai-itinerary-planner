@@ -25,18 +25,28 @@ export default function LoginPage() {
     setError("")
 
     try {
-      const { error } = await signIn(email, password)
+      const { data, error } = await signIn(email, password)
 
       if (error) {
         setError(error.message)
       } else {
-        window.location.href = "/dashboard"
+        // Check if this is admin login
+        if (email === 'admin@gmail.com' && password === 'admin@1234') {
+          window.location.href = "/admin"
+        } else {
+          window.location.href = "/dashboard"
+        }
       }
     } catch (err) {
       setError("Invalid email or password")
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const fillAdminCredentials = () => {
+    setEmail('admin@gmail.com')
+    setPassword('admin@1234')
   }
 
   return (
@@ -109,6 +119,20 @@ export default function LoginPage() {
               <Link href="/forgot-password" className="text-sm text-muted-foreground hover:underline">
                 Forgot your password?
               </Link>
+            </div>
+
+            <div className="bg-muted p-3 rounded-lg text-center">
+              <p className="text-xs text-muted-foreground mb-1">Admin Login:</p>
+              <p className="text-xs font-mono mb-2">admin@gmail.com / admin@1234</p>
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm" 
+                onClick={fillAdminCredentials}
+                className="w-full"
+              >
+                Use Admin Credentials
+              </Button>
             </div>
           </CardFooter>
         </form>
