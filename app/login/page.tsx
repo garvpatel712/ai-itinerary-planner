@@ -121,19 +121,6 @@ export default function LoginPage() {
               </Link>
             </div>
 
-            <div className="bg-muted p-3 rounded-lg text-center">
-              <p className="text-xs text-muted-foreground mb-1">Admin Login:</p>
-              <p className="text-xs font-mono mb-2">admin@gmail.com / admin@1234</p>
-              <Button 
-                type="button" 
-                variant="outline" 
-                size="sm" 
-                onClick={fillAdminCredentials}
-                className="w-full"
-              >
-                Use Admin Credentials
-              </Button>
-            </div>
           </CardFooter>
         </form>
       </Card>
